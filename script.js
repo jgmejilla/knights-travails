@@ -1,39 +1,42 @@
-function KnightsTravails(initialCoords, targetCoords) {
-    function chessToInt(coords) {
-        let [x, y] = coords
-    
-        let tens
-        switch(x.toUpperCase()) {
-            case "A":
-                tens = 0
-                break
-            case "B":
-                tens = 10
-                break
-            case "C":
-                tens = 20
-                break
-            case "D":
-                tens = 30
-                break
-            case "E":
-                tens = 40
-                break
-            case "F":
-                tens = 50
-                break
-            case "G":
-                tens = 60
-                break
-            case "H":
-                tens = 70
-                break
-        }
-        ones = 8 - parseInt(y)
-    
-        return tens + ones
-    }
+function chessToInt(coords) {
+    let [x, y] = coords
 
+    let tens = {
+        "A": 0,
+        "B": 10,
+        "C": 20,
+        "D": 30,
+        "E": 40,
+        "F": 50,
+        "G": 60,
+        "H": 70,
+    }[x.toUpperCase()]
+    ones = 8 - parseInt(y)
+
+    return tens + ones
+}
+
+function intToChess(n) {
+    t = Math.floor(n/10)
+    o = n % 10
+ 
+    let c = {
+        0: "A",
+        1: "B",
+        2: "C",
+        3: "D",
+        4: "E",
+        5: "F",
+        6: "G",
+        7: "H",
+    }[t]
+
+    n = (8 - o).toString()
+
+    return c + n
+}
+
+function KnightsTravails(initialCoords, targetCoords) {
     initial = chessToInt(initialCoords)
     target = chessToInt(targetCoords)
 
@@ -124,56 +127,139 @@ function KnightsTravails(initialCoords, targetCoords) {
     visitAll(tree)
     findHeight(tree, 0, [])
 
-    
-    function intToChess(n) {
-        t = Math.floor(n/10)
-        o = n % 10
-     
-        let c
-        switch(t) {
-            case 0:
-                c = "A"
-                break
-            case 1:
-                c = "B"
-                break
-            case 2:
-                c = "C"
-                break
-            case 3:
-                c = "D"
-                break
-            case 4:
-                c = "E"
-                break
-            case 5:
-                c = "F"
-                break
-            case 6:
-                c = "G"
-                break
-            case 7:
-                c = "H"
-                break
-        }
-        n = (8 - o).toString()
-    
-        return c + n
-    }
-    
-    desc = ''
-    desc += `The shortest number of knight moves from ${initialCoords.toUpperCase()} to ${targetCoords.toUpperCase()} is ${knightMoves}.\n`
-    desc += 'One possible path is as follows:\n'
+    let desc = ''
+    desc += `Path from ${initialCoords.toUpperCase()} to ${targetCoords.toUpperCase()}: <b>${knightMoves} moves</b><br>`
 
-    desc += `${intToChess(moveset[0])}\n`
+    desc += `${intToChess(moveset[0])}<br>`
     for (let i = 1; i < moveset.length; i++) {
-        desc += `-> ${intToChess(moveset[i])} (${i})\n`
+        desc += `-> ${intToChess(moveset[i])} (${i})<br>`
     }
 
-    return desc
+    return [desc, moveset]
 }
 
 console.log(KnightsTravails('c6', 'e8'))
+
+function createBoard() {
+    let board = document.querySelector("#board");
+    for (let i = 0; i < 8; i++) {
+        for (let j = 0; j < 8; j++) {
+            let cell = document.createElement("div")
+            // CELL is even-odd pattern, numbered, centered via grid
+            let id = 10*i + 1*j
+
+            if ((i + j) % 2 == 1) {
+                cell.style['background-color'] = 'rgb(240, 240, 240)';
+               
+            } else {
+                cell.style['background-color'] = 'rgb(170, 170, 170)';
+            }
+            
+            cell.style['color'] = 'rgb(50, 50, 50)';
+            cell.style['display'] = 'grid'
+            cell.style['align-items'] = 'center';
+            cell.style['justify-content'] = 'center';
+            cell.style['font-weight'] = 'italic';
+
+            cell.style['font-size'] = '1.6vh';
+            cell.style['grid-area'] = `${j+1} / ${i+1} / ${j+2} / ${i+2}`
+
+            cell.setAttribute("class", "cell")
+            cell.setAttribute("id", `${id}`)
+            cell.textContent = intToChess(id)
+
+            cell.addEventListener('click', selectCell)
+            board.appendChild(cell)
+
+            
+        }
+    }
+}
+
+let firstSelected = false
+let secondSelected = false
+let firstSquare = null
+let secondSquare = null
+
+function reset() {
+    firstSelected = false
+    secondSelected = false
+    firstSquare = null
+    secondSquare = null
+    board.textContent = ''
+    desc = document.getElementById('desc')
+    desc.innerHTML = ''
+
+    initialsquare = document.getElementById('initialsquare')
+    initialsquare.textContent = 'Initial square: '
+    targetsquare = document.getElementById('targetsquare')
+    targetsquare.textContent = 'Target square: '
+    createBoard()
+}
+
+function selectCell(e) {
+    let id = e.target.id
+    let cell = document.getElementById(id)
+
+    if (!firstSelected) {
+        cell.style['background-color'] = 'rgb(98, 227, 128)'
+        cell.style['color'] = 'white'
+
+        initialSquare = document.getElementById("initialsquare")
+        initialSquare.textContent = `Initial square: ${e.target.textContent}`
+
+        firstSelected = true
+        firstSquare = e.target.id
+    }
+
+    else if (firstSelected && !secondSelected) {
+        cell.style['background-color'] = 'rgb(98, 227, 227)'
+        cell.style['color'] = 'white'
+        let targetSquare = document.getElementById("targetsquare")
+        targetSquare.textContent = `Target square: ${e.target.textContent}`
+
+        secondSquare = e.target.id
+        secondSelected = true
+    }
+
+    else if (firstSelected && secondSelected) {
+        let previousCell = document.getElementById(secondSquare)
+        let i = Math.floor(secondSquare / 10)
+        let j = secondSquare % 10
+
+        if ((i + j) % 2 == 1) {
+            previousCell.style['background-color'] = 'rgb(240, 240, 240)';
+           
+        } else {
+            previousCell.style['background-color'] = 'rgb(170, 170, 170)';
+        }
+        previousCell.style['color'] = 'rgb(50, 50, 50)';
+
+        cell.style['background-color'] = 'rgb(98, 227, 227)'
+        cell.style['color'] = 'white'
+        targetSquare = document.getElementById("targetsquare")
+        targetSquare.textContent = `Target square: ${e.target.textContent}`
+        
+        secondSquare = id
+    }
+
+    if (secondSelected) {
+        desc = document.getElementById("desc")
+        desc.innerHTML = KnightsTravails(intToChess(firstSquare), intToChess(secondSquare))[0]
+    }
+    // blue: rgb(98, 227, 227)
+}
+
+button = document.getElementById("reset")
+button.addEventListener("click", reset)
+
+reset()
+
+
+
+
+
+
 
 
 
