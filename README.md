@@ -1,2 +1,2 @@
-live preview: https://jgmejilla.github.io/knights-travails
+live preview: https://jgmejilla.github.io/knights-travails\
 ![Blorange](blorange.png)
