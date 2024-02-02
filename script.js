@@ -135,7 +135,7 @@ function KnightsTravails(initialCoords, targetCoords) {
         desc += `-> ${intToChess(moveset[i])} (${i})<br>`
     }
 
-    return [desc, moveset]
+    return [desc, moveset, knightMoves]
 }
 
 console.log(KnightsTravails('c6', 'e8'))
@@ -201,6 +201,8 @@ function selectCell(e) {
     let id = e.target.id
     let cell = document.getElementById(id)
 
+    
+
     if (!firstSelected) {
         cell.style['background-color'] = 'rgb(98, 227, 128)'
         cell.style['color'] = 'white'
@@ -213,41 +215,78 @@ function selectCell(e) {
     }
 
     else if (firstSelected && !secondSelected) {
+        if (e.target.id == firstSquare) {
+            return
+        }
         cell.style['background-color'] = 'rgb(98, 227, 227)'
         cell.style['color'] = 'white'
-        let targetSquare = document.getElementById("targetsquare")
-        targetSquare.textContent = `Target square: ${e.target.textContent}`
+        
 
         secondSquare = e.target.id
         secondSelected = true
+        cell.textContent = `${intToChess(id)} (${KnightsTravails(intToChess(firstSquare), intToChess(secondSquare))[2]})`
+
+        let targetSquare = document.getElementById("targetsquare")
+        targetSquare.textContent = `Target square: ${intToChess(secondSquare)}`
     }
 
     else if (firstSelected && secondSelected) {
-        let previousCell = document.getElementById(secondSquare)
-        let i = Math.floor(secondSquare / 10)
-        let j = secondSquare % 10
-
-        if ((i + j) % 2 == 1) {
-            previousCell.style['background-color'] = 'rgb(240, 240, 240)';
-           
-        } else {
-            previousCell.style['background-color'] = 'rgb(170, 170, 170)';
+        if (e.target.id == firstSquare) {
+            return
         }
-        previousCell.style['color'] = 'rgb(50, 50, 50)';
+        resetTile(secondSquare)
 
         cell.style['background-color'] = 'rgb(98, 227, 227)'
         cell.style['color'] = 'white'
+        cell.textContent = `${intToChess(id)} (${KnightsTravails(intToChess(firstSquare), intToChess(secondSquare))[2]})`
         targetSquare = document.getElementById("targetsquare")
-        targetSquare.textContent = `Target square: ${e.target.textContent}`
+        targetSquare.textContent = `Target square: ${intToChess(secondSquare)}`
         
         secondSquare = id
     }
 
     if (secondSelected) {
-        desc = document.getElementById("desc")
+        let desc = document.getElementById("desc")
         desc.innerHTML = KnightsTravails(intToChess(firstSquare), intToChess(secondSquare))[0]
+
+        for (let i = 0; i < 8; i++) {
+            for (let j = 0; j < 8; j++) {
+                let id = i*10 + j*1
+                if (id != firstSquare && id != secondSquare) {
+                    resetTile(id)
+                }
+            }
+        }
+
+        let tiles = KnightsTravails(intToChess(firstSquare), intToChess(secondSquare))[1]
+        for (let i = 1; i < tiles.length; i++) {
+            
+            let moveID = tiles[i]
+            let cell = document.getElementById(moveID)
+            if (i != tiles.length-1) {
+                cell.style['background-color'] = 'rgb(217, 126, 242)'
+                cell.style['color'] = 'white'
+                
+            }
+            cell.textContent = `${intToChess(moveID)} (${i})`
+        }
     }
     // blue: rgb(98, 227, 227)
+}
+
+function resetTile(coords) {
+    let cell = document.getElementById(coords)
+    let i = Math.floor(coords / 10)
+    let j = coords % 10
+
+    if ((i + j) % 2 == 1) {
+        cell.style['background-color'] = 'rgb(240, 240, 240)';
+        
+    } else {
+        cell.style['background-color'] = 'rgb(170, 170, 170)';
+    }
+    cell.style['color'] = 'rgb(50, 50, 50)';
+    cell.textContent = `${intToChess(coords)}`
 }
 
 button = document.getElementById("reset")

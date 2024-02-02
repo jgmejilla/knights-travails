@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Knight Shortest Path</title>
     <link rel="stylesheet" href="styles.css">
     <script src="script.js" defer></script>
+
+    <meta property="og:image" content="preview.png"> 
 </head>
 <body>
     <div id="page">
@@ -14,10 +16,15 @@
             <p>Click on any two cells to find the shortest knight path between them.</p>
         </div>
         <div id="info">
-            <button id="reset">reset</button>
-            <h3 id="initialsquare">Initial square:</h3>
-            <h3 id="targetsquare">Target square:</h3>
-            <p id="desc"></p>
+            <div id="controls">
+                <button id="reset">reset</button>
+                <h3 id="initialsquare">Initial square:</h3>
+                <h3 id="targetsquare">Target square:</h3>
+                <p id="desc"></p>
+            </div>
+            <div id="credits">
+                <a href="https://github.com/jgmejilla/knights-travails" target="_blank">made by jgmejilla</a>
+            </div>
         </div>
         <div id="body">
             <div id="board"></div>
